@@ -1,14 +1,28 @@
-const express = require('express');
+const express = require("express");
 const router = express();
-const ownerModel = require('../models/owner-model');
+const ownerModel = require("../models/owner-model");
 
-router.get('/', (req, res) => {
-    res.send("Welcome");
-})
-if(process.env.NODE_ENV !== 'development'){
-    router.post('/test', (req, res) => {
-        res.send("this is a development test");
+if (process.env.NODE_ENV === "development") {
+  router.post("/test", async (req, res) => {
+    let preowner = await ownerModel.find();
+    if (preowner.length > 0) {
+      return res.status(501).send("Owner already exists");
+    }
+
+    let {fullname, email, password} = req.body;
+
+    let owner = await ownerModel.create({
+      fullname,
+      email,
+      password,
     });
+
+    res.send(owner);
+  });
 }
+
+router.get("/", (req, res) => {
+  res.send("Welcome");
+});
 
 module.exports = router;
