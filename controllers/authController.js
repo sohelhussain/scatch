@@ -26,4 +26,20 @@ module.exports.localAuth = async (req, res) => {
     } catch (err) {
       dbgr(err);
     }
-  }
+}
+module.exports.login = async (req, res) => {
+    let {email, password} = req.body;
+
+    let user = await usermodel.findOne({email: email});
+    if(!user) res.status(401).send("your email or password are incorrect");
+
+    bcrypt.compare(password, user.password, (err, result) => {
+        if(result){
+            let token = generateToken(user);
+            res.cookie("token", token);
+            res.send("your are logged in successfully");
+        }else{
+            res.status(401).send("your email or password are incorrect");
+        }
+    })
+}
