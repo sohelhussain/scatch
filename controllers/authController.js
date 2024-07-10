@@ -28,10 +28,12 @@ module.exports.localAuth = async (req, res) => {
     dbgr(err);
   }
 };
+
 module.exports.login = async (req, res) => {
   let { email, password } = req.body;
 
   let user = await usermodel.findOne({ email: email });
+
   if (!user) res.status(401).send("your email or password are incorrect");
   bcrypt.compare(password, user.password, (err, result) => {
     if (result) {
